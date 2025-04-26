@@ -18,6 +18,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifndef off_t
+	typedef int off_t;
+#endif  // !off_t
+
 #define SOFT_I2C_ACK								(0)
 #define SOFT_I2C_NACK								(1)
 
@@ -137,8 +141,8 @@ struct soft_i2c
 		uint32_t holder_handle;
 	} mutex;
 	
-	size_t (*write)(struct soft_i2c *si, uint32_t address, void *data, uint32_t offset, size_t size);
-	size_t (*read )(struct soft_i2c *si, uint32_t address, void *data, uint32_t offset, size_t size);
+	size_t (*write)(struct soft_i2c *si, uint32_t address, void *data, off_t offset, size_t size);
+	size_t (*read )(struct soft_i2c *si, uint32_t address, void *data, off_t offset, size_t size);
 	
 	void (*delay_ns)(uint32_t xns);
 	void (*delay_us)(uint32_t xus);

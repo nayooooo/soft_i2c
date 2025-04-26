@@ -103,14 +103,15 @@ static uint8_t read_byte(struct soft_i2c *si, uint8_t ack, uint32_t x, void (*de
 	return data;
 }
 
-static size_t soft_i2c_write(struct soft_i2c *si, uint32_t address, void *data, uint32_t offset, size_t size)
+static size_t soft_i2c_write(struct soft_i2c *si, uint32_t address, void *data, off_t offset, size_t size)
 {
 	size_t count = 0;
 	uint8_t address_len = si->r_addr_size / 8 + (si->r_addr_size % 8 ? 1 : 0);
 	uint8_t data_len = si->data_size / 8 + (si->data_size % 8 ? 1 : 0);
 	
 	// offset
-	data = (uint8_t *)data + offset * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
+	if (data != NULL)
+		data = (uint8_t *)data + offset * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
 	
 	// start
 	start(si);
@@ -155,6 +156,7 @@ static size_t soft_i2c_write(struct soft_i2c *si, uint32_t address, void *data, 
 	}
 	
 	// data
+	if (data == NULL) goto _stop;
 	for (size_t n = 0; n < size; n++)
 	{
 		void *p = (uint8_t *)data + n * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
@@ -205,14 +207,15 @@ _stop:
 	return count;
 }
 
-static size_t soft_i2c_read(struct soft_i2c *si, uint32_t address, void *data, uint32_t offset, size_t size)
+static size_t soft_i2c_read(struct soft_i2c *si, uint32_t address, void *data, off_t offset, size_t size)
 {
 	size_t count = 0;
 	uint8_t address_len = si->r_addr_size / 8 + (si->r_addr_size % 8 ? 1 : 0);
 	uint8_t data_len = si->data_size / 8 + (si->data_size % 8 ? 1 : 0);
 	
 	// offset
-	data = (uint8_t *)data + offset * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
+	if (data != NULL)
+		data = (uint8_t *)data + offset * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
 	
 	// start
 	start(si);
@@ -283,6 +286,7 @@ static size_t soft_i2c_read(struct soft_i2c *si, uint32_t address, void *data, u
 	}
 	
 	// data
+	if (data == NULL) goto _stop;
 	for (size_t n = 0; n < size; n++)
 	{
 		void *p = (uint8_t *)data + n * (data_len == 1 ? 1 : data_len == 2 ? 2 : 4);
